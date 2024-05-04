@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:object_box/repository/product_repository.dart';
 import 'package:object_box/screen/product/controllers/product_controller.dart';
 import 'package:object_box/utils/utils.dart';
+import 'package:object_box/widget/custom_textfield.dart';
 import '../../../entitas/product.dart';
 import '../../../main.dart';
 import '../../../objectbox.g.dart';
@@ -20,15 +21,12 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   List<Product>? lists = [];
-  ProductRepository? productRepository;
-  final productNameC = TextEditingController();
-  final priceC = TextEditingController();
-  final imageC = TextEditingController();
-  String? photoString;
-  final key = GlobalKey<FormState>();
+  final controller = ProductController();
+
   @override
   void initState() {
-    photoString = '';
+    controller.photoString = '';
+    refreshData();
     super.initState();
   }
 
@@ -37,10 +35,10 @@ class _ProductScreenState extends State<ProductScreen> {
     Uint8List? img = await pickImages(ImageSource.camera);
     if (img != null) {
       setState(() {
-        photoString = Utils.base64String(img);
+        controller.photoString = Utils.base64String(img);
       });
     } else {
-      photoString = '';
+      controller.photoString = '';
     }
   }
 
@@ -53,9 +51,9 @@ class _ProductScreenState extends State<ProductScreen> {
 
   addPro() {
     ProductRepository.addProduct(
-        nameProduct: productNameC.text,
-        image: photoString ?? '',
-        price: priceC.text,
+        nameProduct: controller.productNameC.text,
+        image: controller.photoString ?? '',
+        price: controller.priceC.text,
         boxProduct: products);
   }
 
@@ -64,7 +62,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     final listProduct = products.getAll();
     final geAllProducts = lists = listProduct;
-    final controller = ProductController();
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -74,28 +72,28 @@ class _ProductScreenState extends State<ProductScreen> {
                     cancel: OutlinedButton(
                         onPressed: () {
                           Get.back();
-                          productNameC.text = '';
-                          priceC.text = '';
+                          controller.productNameC.text = '';
+                          controller.priceC.text = '';
                         },
                         child: Text('Cancel')),
                     confirm: ElevatedButton(
                         onPressed: () {
-                          if (key.currentState!.validate()) {
+                          if (controller.key.currentState!.validate()) {
                             setState(() {
                               addPro();
                             });
                             refreshData();
                             Get.back();
                           }
-                          productNameC.clear();
-                          priceC.clear();
+                          controller.productNameC.clear();
+                          controller.priceC.clear();
                         },
                         child: Text('ADD')),
                     content: Form(
-                      key: key,
+                      key: controller.key,
                       child: Column(
                         children: [
-                          TextFormField(
+                          CustomTextfield(
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'nama produk kosong';
@@ -103,29 +101,27 @@ class _ProductScreenState extends State<ProductScreen> {
                                   return null;
                                 }
                               },
-                              controller: productNameC,
-                              decoration:
-                                  InputDecoration(labelText: 'Nama produk')),
-                          TextFormField(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'harga produk kosong';
-                              } else {
-                                return null;
-                              }
-                            },
-                            controller: priceC,
-                            decoration:
-                                InputDecoration(labelText: 'Harga barang'),
-                          ),
+                              controller: controller.productNameC,
+                              decor: InputDecoration(labelText: 'Nama produk')),
+                          CustomTextfield(
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'harga produk kosong';
+                                } else {
+                                  return null;
+                                }
+                              },
+                              controller: controller.priceC,
+                              decor:
+                                  InputDecoration(labelText: 'Harga barang')),
                           SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               SizedBox(
                                   height: 80,
-                                  child: (photoString == null ||
-                                          photoString!.isEmpty)
+                                  child: (controller.photoString == null ||
+                                          controller.photoString!.isEmpty)
                                       ? Image.asset('assets/images/noimage.png')
                                       : Image.asset('assets/images/man.png')),
                               OutlinedButton(
@@ -178,9 +174,9 @@ class _ProductScreenState extends State<ProductScreen> {
                               if (product.id > 0)
                                 ProductRepository.updateProduct(
                                     id: product.id,
-                                    nameProduct: productNameC.text,
-                                    image: imageC.text,
-                                    price: priceC.text,
+                                    nameProduct: controller.productNameC.text,
+                                    image: controller.imageC.text,
+                                    price: controller.priceC.text,
                                     boxProduct: products);
                             },
                             child: Text('EDIT')),
@@ -191,14 +187,13 @@ class _ProductScreenState extends State<ProductScreen> {
                             child: Text('Cancel')),
                         content: Column(
                           children: [
-                            TextField(
-                              controller: productNameC,
-                              decoration:
-                                  InputDecoration(labelText: 'Nama produk'),
+                            CustomTextfield(
+                              controller: controller.productNameC,
+                              decor: InputDecoration(labelText: 'Nama produk'),
                             ),
                             TextField(
                                 keyboardType: TextInputType.number,
-                                controller: priceC,
+                                controller: controller.priceC,
                                 decoration:
                                     InputDecoration(labelText: 'Harga')),
                             SizedBox(height: 10),

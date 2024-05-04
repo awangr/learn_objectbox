@@ -26,7 +26,7 @@ class _DetailScreenState extends State<DetailScreen> {
     nameC.text = hutang.name;
     amountC.text = hutang.amount;
     detailC.text = hutang.detail;
-    void editData() {
+    editData() {
       UserRepository.editHutang(
           id: hutang.id,
           name: nameC.text,
@@ -119,11 +119,11 @@ class _DetailScreenState extends State<DetailScreen> {
               onPress: () {
                 if (key.currentState!.validate()) {
                   if (hutang.id > 0) {
-                    editData();
-                    Get.back();
+                    setState(() {
+                      Get.back(result: editData());
+                    });
                   }
                 }
-                setState(() {});
               },
             )
           ],

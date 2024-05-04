@@ -9,7 +9,36 @@ class HomeController extends GetxController {
   final amountC = TextEditingController();
   final detailC = TextEditingController();
   final dateC = TextEditingController();
-  Box<Hutang> productss = store.box<Hutang>();
+  Box<Hutang> hutangs = store.box<Hutang>();
+  final key = GlobalKey<FormState>();
+
+//DELETE DATA
+  Future<void> deleteProduct(Hutang hutang) async {
+    Get.defaultDialog(
+      title: 'Peringatan!',
+      content: Text('Anda yakin mau menghapusnya?'),
+      cancel: OutlinedButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: Text(
+            'Batal',
+            style: TextStyle(color: Colors.amber),
+          )),
+      confirm: ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+        onPressed: () async {
+          await hutangs.remove(hutang.id);
+          // fetchData(widget.user);
+          Get.back();
+        },
+        child: Text(
+          'Konfirmasi',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {

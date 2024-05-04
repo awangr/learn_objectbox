@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:object_box/entitas/objectbox.dart';
 import 'package:get/get.dart';
 import 'package:object_box/screen/product/views/product_screen.dart';
 import 'package:objectbox/objectbox.dart';
-// import 'entitas/person.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'screen/sigin/views/sigin_screen.dart';
 
 late Store store;

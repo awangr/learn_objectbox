@@ -10,6 +10,7 @@ import 'package:object_box/screen/sigin/controllers/sing_controller.dart';
 import 'package:object_box/screen/sigup/views/sigup_screen.dart';
 import 'package:object_box/utils/constans/app_style.dart';
 import 'package:object_box/widget/custom_elevated.dart';
+import 'package:object_box/widget/custom_textfield.dart';
 
 class SiginScreen extends StatefulWidget {
   const SiginScreen({super.key});
@@ -43,32 +44,30 @@ class _SiginScreenState extends State<SiginScreen> {
                 width: 200,
                 child: LottieBuilder.asset('assets/lotties/login.json')),
             SizedBox(height: 100),
-            TextFormField(
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'username is required';
-                }
-                return null;
-              },
-              controller: usernameC,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  hintText: 'Username',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10))),
-            ),
+            CustomTextfield(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'username is required';
+                  }
+                  return null;
+                },
+                controller: usernameC,
+                decor: InputDecoration(
+                    prefixIcon: Icon(Icons.person),
+                    hintText: 'Username',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)))),
             SizedBox(height: 10),
-            Obx(
-              () => TextFormField(
-                obscureText: controller.isVisible.value,
+            Obx(() => CustomTextfield(
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'password is required';
                   }
                   return null;
                 },
+                obscureText: controller.isVisible.value,
                 controller: passC,
-                decoration: InputDecoration(
+                decor: InputDecoration(
                     prefixIcon: Icon(Icons.lock),
                     suffixIcon: IconButton(
                         onPressed: () {
@@ -79,9 +78,7 @@ class _SiginScreenState extends State<SiginScreen> {
                             : Icon(Icons.visibility))),
                     hintText: 'Password',
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10))),
-              ),
-            ),
+                        borderRadius: BorderRadius.circular(10))))),
             SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
