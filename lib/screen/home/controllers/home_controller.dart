@@ -5,11 +5,11 @@ import 'package:object_box/objectbox.g.dart';
 import '../../../main.dart';
 
 class HomeController extends GetxController {
+  Box<Hutang> hutangs = store.box<Hutang>();
   final nameC = TextEditingController();
   final amountC = TextEditingController();
   final detailC = TextEditingController();
   final dateC = TextEditingController();
-  Box<Hutang> hutangs = store.box<Hutang>();
   final key = GlobalKey<FormState>();
 
 //DELETE DATA

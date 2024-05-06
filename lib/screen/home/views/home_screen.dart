@@ -10,6 +10,7 @@ import 'package:object_box/objectbox.g.dart';
 import 'package:object_box/repository/user_repository.dart';
 import 'package:object_box/screen/detail/views/detail_screen.dart';
 import 'package:object_box/screen/home/controllers/home_controller.dart';
+import 'package:object_box/screen/product/views/product_screen.dart';
 import 'package:object_box/screen/sigin/views/sigin_screen.dart';
 import '../../../main.dart';
 
@@ -24,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final Box<Hutang> products = store.box<Hutang>();
   List<Hutang> lists = [];
+  final controller = Get.put(HomeController());
   Box<Hutang> hutangBox = store.box<Hutang>();
   @override
   void initState() {
@@ -42,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HomeController());
     final listsHutang = products.getAll();
     final geAllProducts = lists = listsHutang;
 
@@ -92,16 +93,30 @@ class _HomeScreenState extends State<HomeScreen> {
 //     }
 
     return Scaffold(
-        appBar: _appbar(),
-        body: _body(geAllProducts, controller),
-        bottomNavigationBar: BottomAppBar(
-          height: 50,
-          color: Colors.grey.shade200,
-          shape: CircularNotchedRectangle(),
+      appBar: _appbar(),
+      body: _body(geAllProducts, controller),
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.shopping_bag_sharp),
+              onPressed: () {
+                Get.to(ProductScreen());
+              },
+            ),
+          ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: _floatingActionButton(
-            controller.key, addProduct, controller, context, now));
+        color: Colors.grey.shade200,
+      ),
+      // floatingActionButton: _floatingActionButton(
+      //     controller.key, addProduct, controller, context, now)
+    );
   }
 
 /////////////////////////////////////////////////////////////////////////////////////////

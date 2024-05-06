@@ -11,6 +11,7 @@ class ProductController extends GetxController {
   final productNameC = TextEditingController();
   final priceC = TextEditingController();
   final imageC = TextEditingController();
+  final nameSearch = TextEditingController();
 
   String? photoString;
   Future<List<Product>> getProducts() async {

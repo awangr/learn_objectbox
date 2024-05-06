@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:object_box/entitas/hutang.dart';
 import 'package:object_box/repository/user_repository.dart';
+import 'package:object_box/screen/detail/controllers/detail_controller.dart';
 import 'package:object_box/utils/constans/app_style.dart';
 import 'package:object_box/widget/custom_elevated.dart';
 import '../../../main.dart';
@@ -16,23 +17,21 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   Hutang hutang = Get.arguments;
-  final nameC = TextEditingController();
-  final amountC = TextEditingController();
-  final detailC = TextEditingController();
+  final controller = DetailController();
   final key = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final Box<Hutang> hutangs = store.box<Hutang>();
-    nameC.text = hutang.name;
-    amountC.text = hutang.amount;
-    detailC.text = hutang.detail;
+    controller.nameC.text = hutang.name;
+    controller.amountC.text = hutang.amount;
+    controller.detailC.text = hutang.detail;
     editData() {
       UserRepository.editHutang(
           id: hutang.id,
-          name: nameC.text,
-          detail: detailC.text,
+          name: controller.nameC.text,
+          detail: controller.detailC.text,
           date: hutang.date,
-          amount: amountC.text,
+          amount: controller.amountC.text,
           user: hutang.user.target!,
           hutangBox: hutangs);
     }
@@ -55,7 +54,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   return null;
                 }
               },
-              controller: nameC,
+              controller: controller.nameC,
               decoration: InputDecoration(
                   hintText: 'Nama',
                   labelText: 'Nama',
@@ -70,7 +69,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   return null;
                 }
               },
-              controller: amountC,
+              controller: controller.amountC,
               decoration: InputDecoration(
                   hintText: 'Total',
                   labelText: 'Total',
@@ -85,7 +84,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   return null;
                 }
               },
-              controller: detailC,
+              controller: controller.detailC,
               maxLines: 4,
               decoration: InputDecoration(
                   labelText: 'Deskripsi',
