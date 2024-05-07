@@ -50,7 +50,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 8329834005480243535),
       name: 'Hutang',
-      lastPropertyId: const obx_int.IdUid(7, 8008372421022935981),
+      lastPropertyId: const obx_int.IdUid(8, 6642515520818408747),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -79,17 +79,17 @@ final _entities = <obx_int.ModelEntity>[
             type: 10,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 575190988390539966),
-            name: 'category',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
             id: const obx_int.IdUid(7, 8008372421022935981),
             name: 'userId',
             type: 11,
             flags: 520,
             indexId: const obx_int.IdUid(2, 8725377310297461820),
-            relationTarget: 'User')
+            relationTarget: 'User'),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 6642515520818408747),
+            name: 'belumLunas',
+            type: 1,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -202,7 +202,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         6808811515250735179,
         6453114044628032628,
         5767844445341739954,
-        4228336344123098789
+        4228336344123098789,
+        575190988390539966
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -254,17 +255,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final nameOffset = fbb.writeString(object.name);
           final detailOffset = fbb.writeString(object.detail);
           final amountOffset = fbb.writeString(object.amount);
-          final categoryOffset = object.category == null
-              ? null
-              : fbb.writeString(object.category!);
-          fbb.startTable(8);
+          fbb.startTable(9);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addOffset(2, detailOffset);
           fbb.addOffset(3, amountOffset);
           fbb.addInt64(4, object.date?.millisecondsSinceEpoch);
-          fbb.addOffset(5, categoryOffset);
           fbb.addInt64(6, object.user.targetId);
+          fbb.addBool(7, object.belumLunas);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -284,15 +282,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final dateParam = dateValue == null
               ? null
               : DateTime.fromMillisecondsSinceEpoch(dateValue);
-          final categoryParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGetNullable(buffer, rootOffset, 14);
+          final belumLunasParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 18, false);
           final object = Hutang(
               id: idParam,
               name: nameParam,
               detail: detailParam,
               amount: amountParam,
               date: dateParam,
-              category: categoryParam);
+              belumLunas: belumLunasParam);
           object.user.targetId =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0);
           object.user.attach(store);
@@ -407,13 +405,13 @@ class Hutang_ {
   /// see [Hutang.date]
   static final date = obx.QueryDateProperty<Hutang>(_entities[1].properties[4]);
 
-  /// see [Hutang.category]
-  static final category =
-      obx.QueryStringProperty<Hutang>(_entities[1].properties[5]);
-
   /// see [Hutang.user]
   static final user =
-      obx.QueryRelationToOne<Hutang, User>(_entities[1].properties[6]);
+      obx.QueryRelationToOne<Hutang, User>(_entities[1].properties[5]);
+
+  /// see [Hutang.belumLunas]
+  static final belumLunas =
+      obx.QueryBooleanProperty<Hutang>(_entities[1].properties[6]);
 }
 
 /// [Category] entity fields to define ObjectBox queries.

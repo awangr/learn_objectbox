@@ -92,6 +92,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   focusedBorder: OutlineInputBorder(),
                   border: OutlineInputBorder()),
             ),
+            Text(hutang.belumLunas == true ? 'Belum Lunas' : 'Lunas'),
             SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,

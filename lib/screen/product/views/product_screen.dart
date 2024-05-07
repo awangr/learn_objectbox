@@ -64,17 +64,20 @@ class _ProductScreenState extends State<ProductScreen> {
     final listProduct = products.getAll();
     final geAllProducts = lists = listProduct;
     void searchProduct(String productName) {
-      if (productName.isEmpty) {
-        geAllProducts.assignAll(listProduct);
-      } else {
-        geAllProducts.assignAll(listProduct.where((product) => product
-            .productName
-            .toLowerCase()
-            .contains(productName.toLowerCase())));
-      }
+      setState(() {
+        if (productName.isEmpty) {
+          geAllProducts.assignAll(listProduct);
+        } else {
+          geAllProducts.assignAll(listProduct.where((product) => product
+              .productName
+              .toLowerCase()
+              .contains(productName.toLowerCase())));
+        }
+      });
     }
 
     return Scaffold(
+      appBar: AppBar(automaticallyImplyLeading: false),
       body: ListView(
         padding: EdgeInsets.all(15),
         children: [
@@ -103,73 +106,101 @@ class _ProductScreenState extends State<ProductScreen> {
               } else if (snapshot.hasData) {
                 return geAllProducts.isEmpty
                     ? LottieBuilder.asset('assets/lotties/empty.json')
-                    : ListView.builder(
-                        padding: EdgeInsets.symmetric(vertical: 10),
+                    : GridView.builder(
                         shrinkWrap: true,
                         itemCount: geAllProducts.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 9,
+                            childAspectRatio: 2.6,
+                            crossAxisCount: 2),
                         itemBuilder: (context, index) {
-                          var product = snapshot.data?[index] ?? null;
-
                           String? photo = 'assets/images/noimage.png';
-                          // productNameC.text = product!.productName;
-                          // priceC.text = product.price;
-
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(width: 1),
-                                  borderRadius: BorderRadius.circular(15)),
-                              splashColor: Colors.white,
-                              subtitle:
-                                  Text('Rp. ${product!.price.toString()}'),
-                              leading: (product.image.isEmpty)
-                                  ? Image.asset(photo)
-                                  : Utils.imageFromBase64String(product.image),
-                              title: Text('${product.productName}'),
-                              onTap: () {
-                                Get.to(DetailProductScreen(),
-                                    arguments: product);
-                                // Get.defaultDialog(
-                                //     confirm: ElevatedButton(
-                                //         onPressed: () {
-                                //           if (product.id > 0)
-                                //             ProductRepository.updateProduct(
-                                //                 id: product.id,
-                                //                 nameProduct: controller.productNameC.text,
-                                //                 image: controller.imageC.text,
-                                //                 price: controller.priceC.text,
-                                //                 boxProduct: products);
-                                //         },
-                                //         child: Text('EDIT')),
-                                //     cancel: OutlinedButton(
-                                //         onPressed: () {
-                                //           Get.back();
-                                //         },
-                                //         child: Text('Cancel')),
-                                //     content: Column(
-                                //       children: [
-                                //         CustomTextfield(
-                                //           controller: controller.productNameC,
-                                //           decor: InputDecoration(labelText: 'Nama produk'),
-                                //         ),
-                                //         TextField(
-                                //             keyboardType: TextInputType.number,
-                                //             controller: controller.priceC,
-                                //             decoration:
-                                //                 InputDecoration(labelText: 'Harga')),
-                                //         SizedBox(height: 10),
-                                //         SizedBox(
-                                //             height: 200,
-                                //             child:
-                                //                 Utils.imageFromBase64String(product.image)),
-                                //       ],
-                                //     ));
-                              },
-                            ),
+                          var product = geAllProducts[index];
+                          return ListTile(
+                            tileColor: Colors.amber.withOpacity(0.1),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            onTap: () {
+                              Get.to(DetailProductScreen(), arguments: product);
+                            },
+                            subtitle: Text('${product.price}'),
+                            leading: Container(
+                                height: 130,
+                                child: (product.image.isEmpty)
+                                    ? Image.asset(photo)
+                                    : Utils.imageFromBase64String(
+                                        product.image)),
+                            title: Text('${product.productName}'),
                           );
                         },
                       );
+                // : ListView.builder(
+                //     padding: EdgeInsets.symmetric(vertical: 10),
+                //     shrinkWrap: true,
+                //     itemCount: geAllProducts.length,
+                //     itemBuilder: (context, index) {
+                //       var product = snapshot.data?[index] ?? null;
+                //       String? photo = 'assets/images/noimage.png';
+                //       // productNameC.text = product!.productName;
+                //       // priceC.text = product.price;
+
+                //       return Padding(
+                //         padding: const EdgeInsets.all(8.0),
+                //         child: ListTile(
+                //           shape: RoundedRectangleBorder(
+                //               side: BorderSide(width: 1),
+                //               borderRadius: BorderRadius.circular(15)),
+                //           splashColor: Colors.white,
+                //           subtitle:
+                //               Text('Rp. ${product!.price.toString()}'),
+                //           leading: (product.image.isEmpty)
+                //               ? Image.asset(photo)
+                //               : Utils.imageFromBase64String(product.image),
+                //           title: Text('${product.productName}'),
+                //           onTap: () {
+                //             Get.to(DetailProductScreen(),
+                //                 arguments: product);
+                //             // Get.defaultDialog(
+                //             //     confirm: ElevatedButton(
+                //             //         onPressed: () {
+                //             //           if (product.id > 0)
+                //             //             ProductRepository.updateProduct(
+                //             //                 id: product.id,
+                //             //                 nameProduct: controller.productNameC.text,
+                //             //                 image: controller.imageC.text,
+                //             //                 price: controller.priceC.text,
+                //             //                 boxProduct: products);
+                //             //         },
+                //             //         child: Text('EDIT')),
+                //             //     cancel: OutlinedButton(
+                //             //         onPressed: () {
+                //             //           Get.back();
+                //             //         },
+                //             //         child: Text('Cancel')),
+                //             //     content: Column(
+                //             //       children: [
+                //             //         CustomTextfield(
+                //             //           controller: controller.productNameC,
+                //             //           decor: InputDecoration(labelText: 'Nama produk'),
+                //             //         ),
+                //             //         TextField(
+                //             //             keyboardType: TextInputType.number,
+                //             //             controller: controller.priceC,
+                //             //             decoration:
+                //             //                 InputDecoration(labelText: 'Harga')),
+                //             //         SizedBox(height: 10),
+                //             //         SizedBox(
+                //             //             height: 200,
+                //             //             child:
+                //             //                 Utils.imageFromBase64String(product.image)),
+                //             //       ],
+                //             //     ));
+                //           },
+                //         ),
+                //       );
+                //     },
+                //   );
               } else {
                 return Text('Tidak ada data');
               }

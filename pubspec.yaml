@@ -30,14 +30,15 @@ environment:
 dependencies:
   animated_custom_dropdown: ^3.0.0
   build_runner: ^2.4.9
+  calendar_appbar: ^0.0.6
   convex_bottom_bar: ^3.2.0
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  flutter_speed_dial: ^7.0.0
   get: ^4.6.6
   http: ^1.2.1
   image_picker: ^1.1.0
-  intl: ^0.18.1
   lottie: ^3.1.0
   objectbox: ^2.5.1
   objectbox_flutter_libs: any

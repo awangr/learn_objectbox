@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:object_box/entitas/product.dart';
 import 'package:object_box/screen/detail_product/controllers/detail_product_controller.dart';
+import 'package:object_box/screen/product/views/product_screen.dart';
+import '../../../main.dart';
 import '../../../utils/constans/app_style.dart';
 import '../../../utils/utils.dart';
 import '../../../widget/custom_elevated.dart';
@@ -14,12 +16,50 @@ class DetailProductScreen extends StatefulWidget {
 }
 
 class _DetailProductScreenState extends State<DetailProductScreen> {
+  Product product = Get.arguments;
+  final productBox = store.box<Product>();
+
   @override
   Widget build(BuildContext context) {
     final controller = DetailProductController();
-    Product product = Get.arguments;
+
     controller.productNameC.text = product.productName;
     controller.priceC.text = product.price;
+    void editProduct() {
+      productBox.put(Product(
+          id: product.id,
+          productName: controller.productNameC.text,
+          price: controller.priceC.text,
+          image: product.image));
+      setState(() {});
+    }
+
+    Future<void> deleteProduct(Product product) async {
+      Get.defaultDialog(
+        title: 'Peringatan!',
+        content: Text('Anda yakin mau menghapusnya?'),
+        cancel: OutlinedButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text(
+              'Batal',
+              style: TextStyle(color: Colors.amber),
+            )),
+        confirm: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+          onPressed: () async {
+            await productBox.remove(product.id);
+            Get.to(ProductScreen());
+          },
+          child: Text(
+            'Konfirmasi',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(),
       body: Form(
@@ -57,34 +97,12 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
                   border: OutlineInputBorder()),
             ),
             SizedBox(height: 10),
-            // TextFormField(
-            //   validator: (value) {
-            //     if (value!.isEmpty) {
-            //       return 'deskripsi tidak boleh kosong';
-            //     } else {
-            //       return null;
-            //     }
-            //   },
-            //   controller: controller.detailC,
-            //   maxLines: 4,
-            //   decoration: InputDecoration(
-            //       labelText: 'Deskripsi',
-            //       hintText: 'Deskripsi',
-            //       focusedBorder: OutlineInputBorder(),
-            //       border: OutlineInputBorder()),
-            // ),
-            // SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                    // width: 200,
-                    height: 200,
-                    child: product.image.isEmpty
-                        ? Image.asset('assets/images/noimage.png')
-                        : Utils.imageFromBase64String(product.image)),
-              ],
-            ),
+            SizedBox(
+                width: Get.width / 2,
+                // height: 200,
+                child: product.image.isEmpty
+                    ? Image.asset('assets/images/noimage.png')
+                    : Utils.imageFromBase64String(product.image)),
             SizedBox(height: 10),
             CustomElevated(
               text: Text(
@@ -93,14 +111,22 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
               ),
               onPress: () {
                 if (controller.key.currentState!.validate()) {
-                  if (product.id > 0) {
-                    setState(() {
-                      // Get.back(result: editData());
-                    });
-                  }
+                  setState(() {
+                    editProduct();
+                    // Get.back(result: editData());
+                  });
+                  Get.to(ProductScreen());
                 }
               },
-            )
+            ),
+            OutlinedButton(
+                onPressed: () {
+                  deleteProduct(product);
+                },
+                child: Text(
+                  'Hapus Produk',
+                  style: TextStyle(color: Colors.pink),
+                ))
           ],
         ),
       ),

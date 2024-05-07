@@ -8,8 +8,7 @@ class Hutang {
   String detail;
   String amount;
   DateTime? date;
-  String? category;
-
+  bool belumLunas;
   ToOne<User> user = ToOne<User>();
 
   Hutang(
@@ -18,5 +17,5 @@ class Hutang {
       required this.detail,
       required this.amount,
       this.date,
-      this.category = ''});
+      this.belumLunas = true});
 }

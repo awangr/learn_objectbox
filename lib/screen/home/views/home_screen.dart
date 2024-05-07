@@ -1,5 +1,6 @@
 // ignore_for_file: unused_element
 
+import 'package:calendar_appbar/calendar_appbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,15 +24,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final Box<Hutang> products = store.box<Hutang>();
   List<Hutang> lists = [];
   final controller = Get.put(HomeController());
   Box<Hutang> hutangBox = store.box<Hutang>();
+  late DateTime date;
+  void updateView(DateTime? datetime) {
+    setState(() {
+      if (datetime == null) {
+        date = DateTime.parse(DateFormat('yyyy-MM-dd').format(datetime!));
+      }
+    });
+  }
+
   @override
   void initState() {
-    products.getAll();
-    fetchData(widget.user);
-
+    hutangBox.getAll();
+    // fetchData(widget.user);
+    // date = DateTime.now();
     super.initState();
   }
 
@@ -44,79 +53,169 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final listsHutang = products.getAll();
+    final listsHutang = hutangBox.getAll();
     final geAllProducts = lists = listsHutang;
 
     DateTime now = DateTime.now();
 
 //TAMBAH DATA
     Future<void> addProduct() async {
-      UserRepository.addHutang(
-          name: controller.nameC.text,
-          detail: controller.detailC.text,
-          amount: controller.amountC.text,
-          user: widget.user,
-          date: now,
-          hutangBox: hutangBox);
-      controller.nameC.text = '';
-      controller.detailC.text = '';
-      controller.amountC.text = '';
-      controller.dateC.text = '';
+      setState(() {
+        UserRepository.addHutang(
+            name: controller.nameC.text,
+            detail: controller.detailC.text,
+            amount: controller.amountC.text,
+            user: widget.user,
+            date: now,
+            hutangBox: hutangBox);
+        controller.nameC.text = '';
+        controller.detailC.text = '';
+        controller.amountC.text = '';
+        controller.dateC.text = '';
+      });
     }
 
-// //DELETE DATA
-//     Future<void> deleteProduct(Hutang hutang) async {
-//       Get.defaultDialog(
-//         title: 'Peringatan!',
-//         content: Text('Anda yakin mau menghapusnya?'),
-//         cancel: OutlinedButton(
-//             onPressed: () {
-//               Get.back();
-//             },
-//             child: Text(
-//               'Batal',
-//               style: TextStyle(color: Colors.amber),
-//             )),
-//         confirm: ElevatedButton(
-//           style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-//           onPressed: () async {
-//             await products.remove(hutang.id);
-//             fetchData(widget.user);
-//             Get.back();
-//           },
-//           child: Text(
-//             'Konfirmasi',
-//             style: TextStyle(color: Colors.white),
-//           ),
-//         ),
-//       );
-//     }
+//DELETE DATA
+    Future<void> deleteProduct(Hutang hutang) async {
+      Get.defaultDialog(
+        title: 'Peringatan!',
+        content: Text('Anda yakin mau menghapusnya?'),
+        cancel: OutlinedButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text(
+              'Batal',
+              style: TextStyle(color: Colors.amber),
+            )),
+        confirm: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+          onPressed: () async {
+            await hutangBox.remove(hutang.id);
+            fetchData(widget.user);
+            Get.back();
+          },
+          child: Text(
+            'Konfirmasi',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
-      appBar: _appbar(),
-      body: _body(geAllProducts, controller),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.shopping_bag_sharp),
-              onPressed: () {
-                Get.to(ProductScreen());
-              },
-            ),
-          ],
+        appBar: CalendarAppBar(
+            accent: Colors.teal,
+            backButton: false,
+            firstDate: DateTime.now().subtract(Duration(days: 140)),
+            lastDate: now,
+            onDateChanged: (DateTime val) {
+              setState(() {
+                print(val);
+              });
+            }),
+        // appBar: _appbar(),
+        body: ListView.builder(
+          padding: EdgeInsets.all(10),
+          shrinkWrap: true,
+          itemCount: geAllProducts.length,
+          itemBuilder: (context, index) {
+            var data = geAllProducts[index];
+            // final utang = geAllProducts[index];
+            if (data.user.target!.id == widget.user.id) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
+                    Get.to(DetailScreen(), arguments: data);
+                  },
+                  child: Ink(
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: data.belumLunas == true
+                                      ? Colors.amber
+                                      : Colors.teal,
+                                  borderRadius: BorderRadius.circular(5)),
+                              width: 10,
+                              height: 65,
+                            ),
+                            SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${data.name}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text('Rp. ${data.amount}'),
+                                SizedBox(height: 8),
+                                // Container(
+                                //   width: Get.width / 1.95,
+                                //   child: Text(
+                                //     '${product.detail}',
+                                //     style: TextStyle(fontSize: 12),
+                                //     overflow: TextOverflow.ellipsis,
+                                //   ),
+                                // ),
+                                SizedBox(height: 8),
+                                Text(data.belumLunas == true
+                                    ? 'Belum lunas'
+                                    : 'Lunas')
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  deleteProduct(data);
+                                },
+                                icon: Icon(Icons.delete, color: Colors.pink)),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                '${data.date!.hour}:${data.date!.minute}',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                '${data.date!.day}/${data.date!.month}/${data.date!.year}',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return SizedBox();
+            }
+          },
         ),
-        color: Colors.grey.shade200,
-      ),
-      // floatingActionButton: _floatingActionButton(
-      //     controller.key, addProduct, controller, context, now)
-    );
+        // body: _body(geAllProducts, controller),
+        floatingActionButton: _floatingActionButton(
+            controller.key, addProduct, controller, context, now));
   }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -170,26 +269,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
   SafeArea _body(List<Hutang> geAllProducts, HomeController controller) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: geAllProducts.isEmpty
-            ? Center(child: LottieBuilder.asset('assets/lotties/empty.json'))
-            : ListView(
-                shrinkWrap: true,
-                children: [
-                  ListView.builder(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: OutlinedButton(
+                    onPressed: () => Get.to(ProductScreen()),
+                    child: Text('Lihat Produk')),
+              )
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text('Data Hutang '),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: geAllProducts.isEmpty
+                ? Center(
+                    child: LottieBuilder.asset('assets/lotties/empty.json'))
+                : ListView.builder(
                     padding: EdgeInsets.all(10),
                     shrinkWrap: true,
                     itemCount: geAllProducts.length,
                     itemBuilder: (context, index) {
-                      final product = geAllProducts[index];
-                      if (product.user.target!.id == widget.user.id) {
+                      final utang = geAllProducts[index];
+                      if (utang.user.target!.id == widget.user.id) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(10),
                             onTap: () {
-                              Get.to(DetailScreen(), arguments: product);
+                              Get.to(DetailScreen(), arguments: utang);
                             },
                             child: Ink(
                               decoration: BoxDecoration(
@@ -203,7 +318,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.teal,
+                                            color: utang.belumLunas == true
+                                                ? Colors.amber
+                                                : Colors.teal,
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         width: 10,
@@ -215,22 +332,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${product.name}',
+                                            '${utang.name}',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 15),
+                                                fontSize: 18),
                                             textAlign: TextAlign.start,
                                           ),
-                                          Text('Rp. ${product.amount}'),
+                                          Text('Rp. ${utang.amount}'),
                                           SizedBox(height: 8),
-                                          Container(
-                                            width: Get.width / 1.95,
-                                            child: Text(
-                                              '${product.detail}',
-                                              style: TextStyle(fontSize: 12),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          )
+                                          // Container(
+                                          //   width: Get.width / 1.95,
+                                          //   child: Text(
+                                          //     '${product.detail}',
+                                          //     style: TextStyle(fontSize: 12),
+                                          //     overflow: TextOverflow.ellipsis,
+                                          //   ),
+                                          // ),
+                                          SizedBox(height: 8),
+                                          Text(utang.belumLunas == true
+                                              ? 'Belum lunas'
+                                              : 'Lunas')
                                         ],
                                       ),
                                     ],
@@ -240,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       IconButton(
                                           onPressed: () {
-                                            controller.deleteProduct(product);
+                                            setState(() {});
                                           },
                                           icon: Icon(Icons.delete,
                                               color: Colors.pink)),
@@ -248,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8.0),
                                         child: Text(
-                                          '${product.date!.hour}:${product.date!.minute}',
+                                          '${utang.date!.hour}:${utang.date!.minute}',
                                           style: TextStyle(fontSize: 12),
                                         ),
                                       ),
@@ -256,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8.0),
                                         child: Text(
-                                          '${product.date!.day}/${product.date!.month}/${product.date!.year}',
+                                          '${utang.date!.day}/${utang.date!.month}/${utang.date!.year}',
                                           style: TextStyle(fontSize: 12),
                                         ),
                                       ),
@@ -271,9 +392,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         return SizedBox();
                       }
                     },
-                  )
-                ],
-              ),
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -286,13 +407,16 @@ class _HomeScreenState extends State<HomeScreen> {
       DateTime now) {
     return FloatingActionButton(
       shape: CircleBorder(),
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.teal,
       onPressed: () {
         Get.defaultDialog(
             confirm: ElevatedButton(
                 onPressed: () {
                   if (key.currentState!.validate()) {
-                    addProduct();
+                    setState(() {
+                      addProduct();
+                    });
+
                     Get.back();
                   }
                 },

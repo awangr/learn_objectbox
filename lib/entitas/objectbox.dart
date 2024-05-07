@@ -8,7 +8,7 @@ class ObjectBox {
   static Future<ObjectBox> create() async {
     var diir = await getApplicationDocumentsDirectory();
     Store store =
-        await openStore(directory: p.join(diir.path, 'O' /*'objct'*/));
+        await openStore(directory: p.join(diir.path, 'haha' /*'objct'*/));
     return ObjectBox._create(store);
   }
 }
