@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:object_box/entitas/user.dart';
 import 'package:object_box/screen/home/views/home_screen.dart';
-import 'package:intl/intl.dart';
 import 'package:calendar_appbar/calendar_appbar.dart';
 import 'package:object_box/screen/main/controllers/main_controller.dart';
 

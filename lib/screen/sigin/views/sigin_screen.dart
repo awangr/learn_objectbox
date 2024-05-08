@@ -6,7 +6,6 @@ import 'package:object_box/entitas/user.dart';
 import 'package:object_box/main.dart';
 import 'package:object_box/objectbox.g.dart';
 import 'package:object_box/screen/home/views/home_screen.dart';
-import 'package:object_box/screen/main/views/main_screen.dart';
 import 'package:object_box/screen/sigin/controllers/sing_controller.dart';
 import 'package:object_box/screen/sigup/views/sigup_screen.dart';
 import 'package:object_box/utils/constans/app_style.dart';

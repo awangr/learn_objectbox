@@ -33,7 +33,8 @@ class _DetailScreenState extends State<DetailScreen> {
           date: hutang.date,
           amount: controller.amountC.text,
           user: hutang.user.target!,
-          hutangBox: hutangs);
+          hutangBox: hutangs,
+          belumLunas: hutang.belumLunas);
     }
 
     return Scaffold(
@@ -92,7 +93,23 @@ class _DetailScreenState extends State<DetailScreen> {
                   focusedBorder: OutlineInputBorder(),
                   border: OutlineInputBorder()),
             ),
-            Text(hutang.belumLunas == true ? 'Belum Lunas' : 'Lunas'),
+            SizedBox(height: 12),
+            SwitchListTile(
+              tileColor: Colors.grey.withOpacity(0.15),
+              activeColor: Colors.pink,
+              inactiveTrackColor: Colors.teal.shade300,
+              inactiveThumbColor: Colors.teal,
+              title: Text(hutang.belumLunas == true ? 'Belum lunas' : 'Lunas'),
+              value: hutang.belumLunas,
+              onChanged: (bool value) {
+                setState(() {
+                  hutang.belumLunas = value;
+                });
+              },
+              secondary:
+                  Icon(hutang.belumLunas == true ? Icons.cancel : Icons.check),
+            ),
+            //Text(hutang.belumLunas == true ? 'Belum Lunas' : 'Lunas'),
             SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -106,6 +123,7 @@ class _DetailScreenState extends State<DetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // Text('${hutang.date}')
                 Text(
                     '${hutang.date!.day}/${hutang.date!.month}/${hutang.date!.year}  ${hutang.date!.hour}:${hutang.date!.minute}'),
               ],

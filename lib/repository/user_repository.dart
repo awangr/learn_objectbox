@@ -23,9 +23,15 @@ class UserRepository {
       required String amount,
       required User user,
       DateTime? date,
-      required Box<Hutang> hutangBox}) {
-    Hutang hutang =
-        Hutang(id: id, name: name, detail: detail, amount: amount, date: date);
+      required Box<Hutang> hutangBox,
+      bool? belumLunas}) {
+    Hutang hutang = Hutang(
+        id: id,
+        name: name,
+        detail: detail,
+        amount: amount,
+        date: date,
+        belumLunas: belumLunas!);
     hutang.user.target = user;
     hutangBox.put(hutang);
   }

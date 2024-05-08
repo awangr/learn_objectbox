@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:object_box/entitas/product.dart';
 import 'package:object_box/screen/detail_product/controllers/detail_product_controller.dart';
-import 'package:object_box/screen/product/views/product_screen.dart';
+
 import '../../../main.dart';
 import '../../../utils/constans/app_style.dart';
 import '../../../utils/utils.dart';
@@ -26,12 +26,20 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
     controller.productNameC.text = product.productName;
     controller.priceC.text = product.price;
     void editProduct() {
-      productBox.put(Product(
-          id: product.id,
-          productName: controller.productNameC.text,
-          price: controller.priceC.text,
-          image: product.image));
-      setState(() {});
+      setState(() {
+        productBox.put(Product(
+            id: product.id,
+            productName: controller.productNameC.text,
+            price: controller.priceC.text,
+            image: product.image));
+      });
+    }
+
+    deletePro() {
+      setState(() {
+        productBox.remove(product.id);
+      });
+      Get.back();
     }
 
     Future<void> deleteProduct(Product product) async {
@@ -48,10 +56,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
             )),
         confirm: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-          onPressed: () async {
-            await productBox.remove(product.id);
-            Get.to(ProductScreen());
-          },
+          onPressed: () {},
           child: Text(
             'Konfirmasi',
             style: TextStyle(color: Colors.white),
@@ -83,6 +88,7 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
             ),
             SizedBox(height: 10),
             TextFormField(
+              keyboardType: TextInputType.number,
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'total tidak boleh kosong';
@@ -115,13 +121,14 @@ class _DetailProductScreenState extends State<DetailProductScreen> {
                     editProduct();
                     // Get.back(result: editData());
                   });
-                  Get.to(ProductScreen());
+                  Get.back();
                 }
               },
             ),
+            SizedBox(height: 8),
             OutlinedButton(
                 onPressed: () {
-                  deleteProduct(product);
+                  deletePro();
                 },
                 child: Text(
                   'Hapus Produk',
