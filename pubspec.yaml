@@ -35,6 +35,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
   flutter_speed_dial: ^7.0.0
   get: ^4.6.6
   http: ^1.2.1
@@ -42,6 +43,7 @@ dependencies:
   lottie: ^3.1.0
   objectbox: ^2.5.1
   objectbox_flutter_libs: any
+  rename: ^3.0.2
   toggle_switch: ^2.3.0
 
 dev_dependencies:
@@ -51,6 +53,12 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/restaurant.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+
 flutter:
 
   # The following line ensures that the Material Icons font is
