@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lottie/lottie.dart';
 import 'package:object_box/repository/product_repository.dart';
-import 'package:object_box/screen/detail_product/views/detail_product_screen.dart';
 import 'package:object_box/screen/home/views/home_screen.dart';
 import 'package:object_box/screen/product/controllers/product_controller.dart';
 import 'package:object_box/utils/utils.dart';
@@ -12,6 +10,9 @@ import 'package:object_box/widget/custom_textfield.dart';
 import '../../../entitas/product.dart';
 import '../../../main.dart';
 import '../../../objectbox.g.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../detail_product/views/detail_product_screen.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -20,17 +21,18 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
-  List<Product>? lists = [];
   final controller = ProductController();
-
+  List<Product>? lists = [];
+  Box<Product> products = store.box<Product>();
+  late TextEditingController searchC = TextEditingController();
   @override
   void initState() {
     controller.photoString = '';
     refreshData();
+    searchC = TextEditingController();
     super.initState();
   }
 
-  final listProduct = products.getAll();
   void pickImage() async {
     Uint8List? img = await pickImages(ImageSource.gallery);
     if (img != null) {
@@ -57,21 +59,28 @@ class _ProductScreenState extends State<ProductScreen> {
         boxProduct: products);
   }
 
-  static Box<Product> products = store.box<Product>();
+  void searchList(String val) {
+    String query = val.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      setState(() {
+        lists = products
+            .getAll()
+            .where((e) => e.productName.toLowerCase().contains(query))
+            .toList();
+      });
+    } else {
+      setState(() {
+        lists = [];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final listProduct = products.getAll();
     final geAllProducts = lists = listProduct;
     final user = Get.arguments;
-    void searchProduct(String productName) {
-      lists = listProduct
-          .where((e) =>
-              e.productName.toLowerCase().contains(productName.toLowerCase()))
-          .toList();
-      setState(() {});
-    }
-
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -94,75 +103,152 @@ class _ProductScreenState extends State<ProductScreen> {
       body: ListView(
         padding: EdgeInsets.all(15),
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 15),
-          //   child: SizedBox(
-          //     height: 50,
-          //     child: TextField(
-          //       onChanged: (value) {
-          //         setState(() {
-          //           searchProduct(value);
-          //         });
-          //       },
-          //       decoration: InputDecoration(
-          //           prefixIcon: Icon(Icons.search),
-          //           hintText: 'Search...',
-          //           border: OutlineInputBorder(
-          //               borderRadius: BorderRadius.circular(15))),
-          //     ),
-          //   ),
+          // TextField(
+          //   onChanged: (value) {
+          //     searchList(value);
+          //   },
+          //   controller: searchC,
+          //   decoration: InputDecoration(
+          //       border: OutlineInputBorder(), labelText: 'Search..'),
           // ),
-          // SizedBox(height: 10),
-          FutureBuilder(
-            future: controller.getProducts(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (snapshot.hasData) {
-                return geAllProducts.isEmpty
-                    ? LottieBuilder.asset('assets/lotties/empty.json')
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        itemCount: geAllProducts.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 9,
-                            childAspectRatio: 2.6,
-                            crossAxisCount: 2),
-                        itemBuilder: (context, index) {
-                          String? photo = 'assets/images/noimage.png';
-                          var product = geAllProducts[index];
-                          return ListTile(
-                            tileColor: Colors.amber.withOpacity(0.4),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            onTap: () {
-                              Get.to(DetailProductScreen(), arguments: product);
-                            },
-                            subtitle: Text('${product.price}'),
-                            leading: Container(
-                                width: 70,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30)),
-                                height: 115,
-                                child: (product.image.isEmpty)
-                                    ? Image.asset(photo)
-                                    : Utils.imageFromBase64String(
-                                        product.image)),
-                            title: Container(
-                                width: 60,
-                                child: Text('${product.productName}',
-                                    overflow: TextOverflow.ellipsis)),
-                          );
-                        },
-                      );
-              } else {
-                return Text('Tidak ada data');
-              }
+          SizedBox(height: 15.h),
+          GridView.builder(
+            shrinkWrap: true,
+            itemCount: lists!.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 9,
+                childAspectRatio: 2.w / 2.6.h,
+                crossAxisCount: 2),
+            itemBuilder: (context, index) {
+              String? photo = 'assets/images/noimage.png';
+              var product = lists![index];
+              return InkWell(
+                hoverColor: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+                onTap: () {
+                  Get.to(DetailProductScreen(), arguments: product);
+                },
+                child: Ink(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      product.image.isEmpty
+                          ? SizedBox(height: 80.h, child: Image.asset(photo))
+                          : SizedBox(
+                              width: width,
+                              child: Utils.imageFromBase64String(product.image),
+                            ),
+                      SizedBox(height: 5.h),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${product.productName}',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Text('Rp. ${product.price}'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             },
-          ),
+          )
+          // FutureBuilder(
+          //   future: controller.getProducts(),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.connectionState == ConnectionState.waiting) {
+          //       return Center(
+          //         child: CircularProgressIndicator(),
+          //       );
+          //     } else if (snapshot.hasData) {
+          //       return geAllProducts.isEmpty
+          //           ? LottieBuilder.asset('assets/lotties/empty.json')
+          //           : GridView.builder(
+          //               shrinkWrap: true,
+          //               itemCount: geAllProducts.length,
+          //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          //                   mainAxisSpacing: 8,
+          //                   crossAxisSpacing: 9,
+          //                   childAspectRatio: 2.w / 2.6.h,
+          //                   crossAxisCount: 2),
+          //               itemBuilder: (context, index) {
+          //                 String? photo = 'assets/images/noimage.png';
+          //                 var product = geAllProducts[index];
+
+          //                 return InkWell(
+          //                   hoverColor: Colors.grey.shade300,
+          //                   borderRadius: BorderRadius.circular(10),
+          //                   onTap: () {
+          //                     Get.to(DetailProductScreen(), arguments: product);
+          //                   },
+          //                   child: Ink(
+          //                     child: Column(
+          //                       crossAxisAlignment: CrossAxisAlignment.start,
+          //                       children: [
+          //                         product.image.isEmpty
+          //                             ? SizedBox(
+          //                                 height: 80.h,
+          //                                 child: Image.asset(photo))
+          //                             : SizedBox(
+          //                                 width: width,
+          //                                 child: Utils.imageFromBase64String(
+          //                                     product.image),
+          //                               ),
+          //                         SizedBox(height: 15.h),
+          //                         Padding(
+          //                           padding: const EdgeInsets.symmetric(
+          //                               horizontal: 10),
+          //                           child: Column(
+          //                             crossAxisAlignment:
+          //                                 CrossAxisAlignment.start,
+          //                             children: [
+          //                               Text(
+          //                                 '${product.productName}',
+          //                                 style: TextStyle(
+          //                                     fontSize: 18,
+          //                                     fontWeight: FontWeight.bold),
+          //                               ),
+          //                               Text('Rp. ${product.price}'),
+          //                             ],
+          //                           ),
+          //                         ),
+          //                       ],
+          //                     ),
+          //                   ),
+          //                 );
+          //                 // return ListTile(
+          //                 //   tileColor: Colors.amber.withOpacity(0.4),
+          //                 //   shape: RoundedRectangleBorder(
+          //                 //       borderRadius: BorderRadius.circular(10)),
+          //                 //   onTap: () {
+          //                 //     Get.to(DetailProductScreen(), arguments: product);
+          //                 //   },
+          //                 //   subtitle: Text('${product.price}'),
+          //                 //   leading: Container(
+          //                 //       height: 115,
+          //                 //       child: (product.image.isEmpty)
+          //                 //           ? Image.asset(photo)
+          //                 //           : Utils.imageFromBase64String(
+          //                 //               product.image)),
+          //                 //   title: Container(
+          //                 //       width: 60,
+          //                 //       child: Text('${product.productName}',
+          //                 //           overflow: TextOverflow.ellipsis)),
+          //                 // );
+          //               },
+          //             );
+          //     } else {
+          //       return Text('Tidak ada data');
+          //     }
+          //   },
+          // ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

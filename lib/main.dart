@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:object_box/entitas/objectbox.dart';
 import 'package:get/get.dart';
 import 'package:object_box/screen/main/views/main_screen.dart';
@@ -21,12 +22,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      scrollBehavior: const MaterialScrollBehavior().copyWith(
-        dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+    return ScreenUtilInit(
+      builder: (context, child) => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+        ),
+        home: SiginScreen(),
       ),
-      home: SiginScreen(),
+      // builder:()=> GetMaterialApp(
+      //   debugShowCheckedModeBanner: false,
+      //   scrollBehavior: const MaterialScrollBehavior().copyWith(
+      //     dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+      //   ),
+      //   home: SiginScreen(),
+      // ),
     );
   }
 }
